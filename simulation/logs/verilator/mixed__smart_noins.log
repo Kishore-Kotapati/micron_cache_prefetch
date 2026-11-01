@@ -1,4 +1,7 @@
-/home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/mixed.trace +tag=smart_noins +mode=3 +adaptive=1 +degree=2 +inslru=0
+/home/kishore/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/mixed.trace +tag=smart_noins +mode=3 +adaptive=1 +degree=2 +inslru=0
 RESULT tag=smart_noins trace=traces/mixed.trace mode=3 adaptive=1 degree=2 inslru=0 accesses=6000 hits=4455 misses=1545 dem_mem=1479 pf_issued=3816 pf_useful=2383 pf_late=66 pf_evict_unused=1291 pf_resident_unused=76 pf_filtered=8120 cand_pushed=11936 final_degree=7 cycles=83135 total_latency=68042 miss_latency_sum=63587 max_latency=44 errors=0
 TEST PASSED
 - testbench/tb_system.v:189: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.045 devel
+- Verilator: $finish at 832us; walltime 0.169 s; speed 4.923 ms/s
+- Verilator: cpu 0.169 s on 1 threads; allocated 7 MB

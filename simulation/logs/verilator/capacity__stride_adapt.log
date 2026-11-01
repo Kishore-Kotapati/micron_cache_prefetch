@@ -1,4 +1,7 @@
-/home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/capacity.trace +tag=stride_adapt +mode=2 +adaptive=1 +degree=2 +inslru=0
+/home/kishore/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/capacity.trace +tag=stride_adapt +mode=2 +adaptive=1 +degree=2 +inslru=0
 RESULT tag=stride_adapt trace=traces/capacity.trace mode=2 adaptive=1 degree=2 inslru=0 accesses=6144 hits=6089 misses=55 dem_mem=9 pf_issued=1527 pf_useful=1481 pf_late=46 pf_evict_unused=0 pf_resident_unused=0 pf_filtered=8571 cand_pushed=10098 final_degree=7 cycles=22100 total_latency=6756 miss_latency_sum=667 max_latency=42 errors=0
 TEST PASSED
 - testbench/tb_system.v:189: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.045 devel
+- Verilator: $finish at 221us; walltime 0.048 s; speed 4.617 ms/s
+- Verilator: cpu 0.048 s on 1 threads; allocated 7 MB

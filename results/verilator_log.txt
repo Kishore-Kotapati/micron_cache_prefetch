@@ -1,5 +1,5 @@
-build OK: Verilator 5.020 2024-01-01 rev (Debian 5.020-1)
-Verilator vs Icarus cross-check (Verilator 5.020 2024-01-01 rev (Debian 5.020-1))
+build OK: Verilator 5.045 devel rev v5.044-88-g1b9f38f78
+Verilator vs Icarus cross-check (Verilator 5.045 devel rev v5.044-88-g1b9f38f78)
 
 sequential  baseline      cycles= 112571 hits= 6144 pf_issued=    0  verilator=PASS  IDENTICAL
 sequential  nextline      cycles=  59723 hits= 6257 pf_issued= 2040  verilator=PASS  IDENTICAL
