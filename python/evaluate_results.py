@@ -36,3 +36,18 @@ for t in ORDER:
 txt = "\n".join(out) + "\n"
 open(os.path.join(ROOT, "results", "summary_tables.md"), "w").write(txt)
 print(txt)
+
+# ---- how close to a perfect cache (every load hits) ----
+# Same CPU model: cycles = gaps + latencies + fixed overhead, so a perfect
+# cache would take  cycles - total_latency + accesses  (latency 1 per load).
+lines = ["### How close to a perfect cache\n",
+         "| Trace | Baseline cycles | Final cycles | Perfect-cache cycles | Speedup now | Max possible | Share of possible gain achieved |",
+         "|---|---|---|---|---|---|---|"]
+for t in ORDER:
+    a = df[(df.trace == t) & (df.config == "baseline")].iloc[0]
+    b = df[(df.trace == t) & (df.config == "smart")].iloc[0]
+    ideal = a.cycles - a.amat_measured * a.accesses + a.accesses
+    lines.append(f"| {t} | {a.cycles} | {b.cycles} | {ideal:.0f} | {b.speedup:.2f}× | {a.cycles/ideal:.2f}× | "
+                 f"{100*(a.cycles-b.cycles)/(a.cycles-ideal):.1f} % |")
+open(os.path.join(ROOT, "results", "ideal_gap.md"), "w").write("\n".join(lines) + "\n")
+print("\n".join(lines))

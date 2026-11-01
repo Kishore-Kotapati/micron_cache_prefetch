@@ -4,9 +4,10 @@ A 4 KB, 4-way cache with an intelligent hardware prefetch engine, written in
 synthesizable Verilog, simulated with Icarus Verilog and measured against the
 same cache without prefetching.
 
-**Measured result (RTL simulation, 9 workloads):** 2.23× geometric-mean
-speedup over the baseline cache, 2.01× on the CNN / LLM / recommendation-inspired
-workloads, never slower than the baseline.
+**Measured result (RTL simulation, 9 workloads):** 2.26× geometric-mean
+speedup over the baseline cache, 2.06× on the CNN / LLM / recommendation-inspired
+workloads, never slower than the baseline. With slower 120-cycle DRAM:
+3.03× / 2.97×. On regular streams it reaches 98–99 % of a perfect cache.
 
 **Verification:** 54/54 Icarus simulations pass all self-checks · the
 baseline matches an independent Python cache model exactly · all 54 runs give
@@ -67,6 +68,8 @@ python3 python/visualize_results.py                  # plots
 python3 python/evaluate_results.py                   # markdown tables
 python3 python/verilator_crosscheck.py               # same 54 runs on Verilator, compare
 python3 python/run_cocotb.py                         # Cocotb tests (results/cocotb_log.txt)
+python3 python/latency_sweep.py                      # DRAM 20/40/80/120-cycle sensitivity (~1 min)
+python3 python/design_sweep.py                       # 16 parameter combinations (~2 min)
 # waveform
 vvp -n simulation/build/sim.vvp +trace=traces/demo.trace +mode=3 +vcd=simulation/waveforms/demo_final.vcd
 gtkwave simulation/waveforms/demo_final.vcd simulation/waveforms/demo.gtkw

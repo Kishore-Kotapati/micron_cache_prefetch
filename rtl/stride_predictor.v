@@ -163,6 +163,15 @@ module stride_predictor #(
                         end else begin
                             if (m_conf != 2'd0) s_conf[midx] <= m_conf - 2'd1;
                             if (m_conf <= 2'd1) s_stride[midx] <= mdiff[STR_W-1:0];
+                            // Hybrid re-sync: the stream jumped (stride broken) and
+                            // the jump missed - treat it like a stream (re)start and
+                            // kick off next-line prefetches while the stride re-trains.
+                            if (mode == MODE_HYBRID && tr_miss && !low_accuracy) begin
+                                trig_valid <= 1'b1;
+                                trig_base  <= {tr_addr[ADDR_W-1:OFF_W], {OFF_W{1'b0}}};
+                                trig_step  <= LINE_BYTES;
+                                trig_count <= NEW_CNT;
+                            end
                         end
                     end
                 end else begin

@@ -51,9 +51,9 @@ Verilator 5.020 `--lint-only -Wall` on the RTL: **0 warnings, 0 errors**
 (`results/verilator_lint.txt`).
 
 **Synthesis check (Yosys 0.33, generic gates, `synth/`):** the design
-synthesizes cleanly (`check -assert` passes) to 99,234 logic cells and 40,771
-flip-flops. The prefetch engine (predictor + queue) is only 4.6 % of the cells
-and 1.7 % of the flip-flops; the rest is cache storage. Generic gates give no
+synthesizes cleanly (`check -assert` passes) to 99,471 logic cells and 40,791
+flip-flops. The prefetch engine (predictor + queue) is only 4.9 % of the cells
+and 1.8 % of the flip-flops; the rest is cache storage. Generic gates give no
 area, timing or power numbers, and no placement was done.
 
 ## 7. Simulation methodology
@@ -139,14 +139,14 @@ Demo trace: 96 sequential loads then 2 random loads.
 | Trace | Hit % A → B | Miss % A → B | AMAT (cyc) A → B | Cycles A → B | Speedup | Improvement | DRAM txns A → B | PF issued | PF accuracy (useful / +late) | Coverage |
 |---|---|---|---|---|---|---|---|---|---|---|
 | sequential | 75.00 → 99.43 | 25.00 → 0.57 | 11.25 → 1.07 | 112571 → 29172 | 3.86× | 74.1 % | 2048 → 2048 | 2040 | 98.1 % / 100.0 % | 97.7 % |
-| stride | 0.00 → 21.10 | 100.00 → 78.90 | 42.00 → 6.04 | 133557 → 25684 | 5.20× | 80.8 % | 3000 → 3009 | 2970 | 21.3 % / 99.7 % | 21.1 % |
+| stride | 0.00 → 21.10 | 100.00 → 78.90 | 42.00 → 6.04 | 133557 → 25688 | 5.20× | 80.8 % | 3000 → 3011 | 2972 | 21.3 % / 99.6 % | 21.1 % |
 | random | 0.28 → 0.28 | 99.72 → 99.72 | 41.89 → 41.89 | 177688 → 177688 | 1.00× | 0.0 % | 3989 → 4021 | 32 | 0.0 % / 0.0 % | 0.0 % |
-| repeated | 97.50 → 97.60 | 2.50 → 2.40 | 2.02 → 1.98 | 17357 → 17193 | 1.01× | 0.9 % | 96 → 98 | 6 | 66.7 % / 66.7 % | 4.2 % |
-| mixed | 34.55 → 72.97 | 65.45 → 27.03 | 27.83 → 11.80 | 182100 → 85886 | 2.12× | 52.8 % | 3927 → 5638 | 4108 | 56.1 % / 58.3 % | 58.7 % |
+| repeated | 97.50 → 98.28 | 2.50 → 1.72 | 2.02 → 1.71 | 17357 → 16127 | 1.08× | 7.1 % | 96 → 98 | 32 | 93.8 % / 93.8 % | 31.2 % |
+| mixed | 34.55 → 72.80 | 65.45 → 27.20 | 27.83 → 11.89 | 182100 → 86455 | 2.11× | 52.5 % | 3927 → 5652 | 4108 | 55.9 % / 58.0 % | 58.4 % |
 | capacity | 75.00 → 99.14 | 25.00 → 0.86 | 11.25 → 1.09 | 84464 → 22016 | 3.84× | 73.9 % | 1536 → 1536 | 1530 | 96.9 % / 100.0 % | 96.5 % |
-| cnn | 80.16 → 95.41 | 19.84 → 4.59 | 9.13 → 2.48 | 112549 → 55596 | 2.02× | 50.6 % | 1698 → 2379 | 2105 | 62.6 % / 68.2 % | 76.9 % |
+| cnn | 80.16 → 95.75 | 19.84 → 4.25 | 9.13 → 2.02 | 112549 → 51680 | 2.18× | 54.1 % | 1698 → 2465 | 2299 | 58.6 % / 67.2 % | 78.6 % |
 | llm | 84.38 → 99.51 | 15.62 → 0.49 | 7.41 → 1.10 | 82323 → 29855 | 2.76× | 63.7 % | 1300 → 1339 | 1330 | 94.7 % / 97.1 % | 96.8 % |
-| recsys | 88.33 → 93.85 | 11.67 → 6.15 | 5.78 → 3.17 | 79479 → 54406 | 1.46× | 31.6 % | 1120 → 2001 | 1548 | 37.7 % / 46.6 % | 47.3 % |
+| recsys | 88.33 → 93.85 | 11.67 → 6.15 | 5.78 → 3.17 | 79479 → 54379 | 1.46× | 31.6 % | 1120 → 2001 | 1549 | 37.7 % / 46.6 % | 47.3 % |
 
 ### Speedup of every architecture (execution cycles, baseline = 1.00)
 
@@ -155,14 +155,14 @@ Demo trace: 96 sequential loads then 2 random loads.
 | sequential | 1.00 | 1.89 | 2.75 | 3.85 | 3.86 | 3.86 |
 | stride | 1.00 | 1.00 | 2.69 | 5.20 | 5.20 | 5.20 |
 | random | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| repeated | 1.00 | 1.13 | 1.00 | 1.00 | 1.01 | 1.01 |
-| mixed | 1.00 | 1.18 | 1.98 | 2.20 | 2.19 | 2.12 |
+| repeated | 1.00 | 1.13 | 1.00 | 1.00 | 1.08 | 1.08 |
+| mixed | 1.00 | 1.18 | 1.98 | 2.20 | 2.19 | 2.11 |
 | capacity | 1.00 | 1.89 | 2.74 | 3.82 | 3.84 | 3.84 |
-| cnn | 1.00 | 1.73 | 1.86 | 2.00 | 2.02 | 2.02 |
+| cnn | 1.00 | 1.73 | 1.86 | 2.00 | 2.18 | 2.18 |
 | llm | 1.00 | 1.89 | 2.40 | 2.74 | 2.76 | 2.76 |
-| recsys | 1.00 | 1.45 | 1.34 | 1.34 | 1.36 | 1.46 |
-| **geo-mean, all 9** | **1.00** | **1.41** | **1.84** | **2.21** | **2.22** | **2.23** |
-| **geo-mean, cnn/llm/recsys** | **1.00** | **1.68** | **1.81** | **1.94** | **1.97** | **2.01** |
+| recsys | 1.00 | 1.45 | 1.34 | 1.34 | 1.37 | 1.46 |
+| **geo-mean, all 9** | **1.00** | **1.41** | **1.84** | **2.21** | **2.25** | **2.26** |
+| **geo-mean, cnn/llm/recsys** | **1.00** | **1.68** | **1.81** | **1.94** | **2.02** | **2.06** |
 
 ### DRAM traffic relative to baseline (cost of prefetching)
 
@@ -172,11 +172,64 @@ Demo trace: 96 sequential loads then 2 random loads.
 | stride | 1.00 | 2.00 | 1.00 | 1.00 | 1.00 | 1.00 |
 | random | 1.00 | 2.00 | 1.00 | 1.00 | 1.01 | 1.01 |
 | repeated | 1.00 | 1.01 | 1.00 | 1.00 | 1.02 | 1.02 |
-| mixed | 1.00 | 1.82 | 1.00 | 1.00 | 1.36 | 1.44 |
+| mixed | 1.00 | 1.82 | 1.00 | 1.00 | 1.35 | 1.44 |
 | capacity | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| cnn | 1.00 | 1.09 | 1.14 | 1.45 | 1.46 | 1.40 |
+| cnn | 1.00 | 1.09 | 1.14 | 1.45 | 1.45 | 1.45 |
 | llm | 1.00 | 1.00 | 1.01 | 1.03 | 1.03 | 1.03 |
 | recsys | 1.00 | 1.27 | 1.65 | 1.65 | 1.97 | 1.79 |
+
+### How close to a perfect cache
+
+| Trace | Baseline cycles | Final cycles | Perfect-cache cycles | Speedup now | Max possible | Share of possible gain achieved |
+|---|---|---|---|---|---|---|
+| sequential | 112571 | 29172 | 28603 | 3.86× | 3.94× | 99.3 % |
+| stride | 133557 | 25688 | 10557 | 5.20× | 12.65× | 87.7 % |
+| random | 177688 | 177688 | 14140 | 1.00× | 12.57× | 0.0 % |
+| repeated | 17357 | 16127 | 13421 | 1.08× | 1.29× | 31.2 % |
+| mixed | 182100 | 86455 | 21096 | 2.11× | 8.63× | 59.4 % |
+| capacity | 84464 | 22016 | 21488 | 3.84× | 3.93× | 99.2 % |
+| cnn | 112549 | 51680 | 42931 | 2.18× | 2.62× | 87.4 % |
+| llm | 82323 | 29855 | 29025 | 2.76× | 2.84× | 98.4 % |
+| recsys | 79479 | 54379 | 33562 | 1.46× | 2.37× | 54.7 % |
+
+* Long regular streams (sequential, capacity, LLM) reach 98–99 % of the best
+  possible result — nothing meaningful is left to win there.
+* `random` cannot be predicted by any prefetcher (0 %), and the same is true
+  for the random 25 % of `mixed` and the randomly chosen rows in `recsys`,
+  which is why those traces stay further from "perfect".
+* `stride` is limited by DRAM bandwidth (one request per 4 cycles), which the
+  perfect-cache bound ignores.
+
+### Sensitivity to DRAM latency (`python/latency_sweep.py`)
+Same RTL, only the DRAM model's latency changes:
+
+| DRAM latency (cycles) | Geo-mean speedup, all 9 | AI-inspired (cnn/llm/recsys) |
+|---|---|---|
+| 20 | 1.82× | 1.62× |
+| 40 | 2.26× | 2.06× |
+| 80 | 2.82× | 2.65× |
+| 120 | 3.03× | 2.97× |
+
+The slower the memory, the bigger the benefit, because each prefetch hides
+more waiting. Real DRAM is typically 100+ CPU cycles away.
+
+![latency](../results/plots/latency_sweep.png)
+
+### Design-space exploration (`python/design_sweep.py`)
+16 combinations of stream-table size (4/8), confidence threshold (1/2),
+quick-start lines (2/3) and accuracy epoch (16/32) were simulated on all 9
+traces. All 16 land between 2.22× and 2.24× geo-mean
+(`results/design_sweep.csv`): the design is **not fragile** to its settings.
+The best combination is only 0.8 % better and was tuned on the same traces
+it would be measured on, so the default settings were kept (no overfitting).
+
+### Evaluated but not adopted: XOR-hashed set index
+The CNN pointwise phase walks 16 channels exactly 256 B apart, so they all map
+to the same 4 sets (conflict misses). Mixing upper address bits into the set
+index (index = addr[9:4] XOR addr[15:10]) was simulated for both baseline
+and final design: CNN improved 3.4 %, but recsys got 1.3 % slower and mixed
+slightly slower. Because it is not a clear win and changes the baseline cache
+itself, it was not adopted (listed as future work).
 
 ![speedup](../results/plots/speedup.png)
 ![baseline vs final](../results/plots/baseline_vs_final.png)
@@ -192,19 +245,20 @@ Demo trace: 96 sequential loads then 2 random loads.
 * `random`: nothing is predictable; the design correctly stays quiet (32
   prefetches in total, speedup 1.00×, DRAM +0.8 %). Plain next-line doubles
   DRAM traffic here.
-* `repeated`: data already fits in the cache — no gain possible (1.01×).
+* `repeated`: data already fits in the cache; only the 96 first-touch misses can be helped (1.08×).
 * CNN / recsys / mixed: real speedups paid for with extra DRAM traffic
-  (+40 % / +79 % / +44 %).
+  (+45 % / +79 % / +44 %).
 
 ## 11. Innovation (what is new in this design)
 1. **Accuracy-feedback degree control** in hardware (degree 1…7 every 32
    prefetches) — biggest single gain: geo-mean 1.84× → 2.21×.
-2. **Accuracy-gated hybrid kick-off** — next-line prefetch only for newly born
-   streams and only while accuracy is good: recsys 1.34× → 1.46× without the
-   random-traffic penalty of next-line.
+2. **Accuracy-gated hybrid kick-off** — 2 next-line prefetches when a stream
+   is born *or jumps* on a miss, only while accuracy is good: CNN 2.00× → 2.18×,
+   recsys 1.34× → 1.37×, repeated 1.00× → 1.08×, without the random-traffic
+   penalty of next-line.
 3. **Accuracy-adaptive insertion** (LRU when guesses are bad, MRU when good):
-   recsys 1.36× → 1.46× and 9 % less DRAM traffic than the same design with
-   normal insertion. Honest note: it costs 3.5 % on `mixed` (2.19× → 2.12×).
+   recsys 1.37× → 1.46× and 9 % less DRAM traffic than the same design with
+   normal insertion. Honest note: it costs 3.8 % on `mixed` (2.19× → 2.11×).
 
 All three share one cheap accuracy monitor (two 6-bit counters).
 
@@ -228,7 +282,7 @@ an SRAM macro for real area, timing and placement.
 ## 14. Conclusion
 A working, verified, reproducible RTL cache with an intelligent prefetch engine
 was built from scratch with only Python, Icarus Verilog, GTKWave and Git
-(+ Verilator, Cocotb, Pandas, Matplotlib). Across 9 workloads it is **2.23× faster
-(geometric mean)** than the same cache without prefetching, **2.01× on the
-AI-inspired workloads**, never slower than the baseline, and every reported
+(+ Verilator, Cocotb, Pandas, Matplotlib). Across 9 workloads it is **2.26× faster
+(geometric mean)** than the same cache without prefetching, **2.06× on the
+AI-inspired workloads** (3.03× / 2.97× with 120-cycle DRAM), never slower than the baseline, and every reported
 number comes from a passing, self-checked simulation.

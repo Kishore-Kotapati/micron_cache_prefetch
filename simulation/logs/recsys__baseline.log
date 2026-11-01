@@ -1,4 +1,4 @@
 vvp -n simulation/build/sim.vvp +trace=traces/recsys.trace +tag=baseline +mode=0 +adaptive=0 +degree=1 +inslru=0
 RESULT tag=baseline trace=traces/recsys.trace mode=0 adaptive=0 degree=1 inslru=0 accesses=9600 hits=8480 misses=1120 dem_mem=1120 pf_issued=0 pf_useful=0 pf_late=0 pf_evict_unused=0 pf_resident_unused=0 pf_filtered=0 cand_pushed=0 final_degree=1 cycles=79479 total_latency=55520 miss_latency_sum=47040 max_latency=42 errors=0
 TEST PASSED
-testbench/tb_system.v:186: $finish called at 794846000 (1ps)
+testbench/tb_system.v:189: $finish called at 794846000 (1ps)

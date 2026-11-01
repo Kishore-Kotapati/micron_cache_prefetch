@@ -27,27 +27,27 @@
 
 === $paramod$6059306f263e7c9ba9c9d43c005c764c102b254b\stride_predictor ===
 
-   Number of wires:               2329
-   Number of wire bits:           2795
+   Number of wires:               2547
+   Number of wire bits:           3013
    Number of public wires:          45
    Number of public wire bits:     507
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:               2587
-     $_ANDNOT_                     681
-     $_AND_                         49
+   Number of cells:               2825
+     $_ANDNOT_                     699
+     $_AND_                         43
      $_DFFE_PP_                     46
      $_DFF_P_                        3
-     $_MUX_                        307
+     $_MUX_                        497
      $_NAND_                        81
-     $_NOR_                        178
-     $_NOT_                        204
-     $_ORNOT_                      196
-     $_OR_                         255
+     $_NOR_                        182
+     $_NOT_                        199
+     $_ORNOT_                      219
+     $_OR_                         249
      $_SDFFCE_PN0P_                138
      $_SDFFE_PP0N_                   1
-     $_SDFFE_PP0P_                  53
+     $_SDFFE_PP0P_                  73
      $_SDFF_PP0_                    48
      $_XNOR_                        87
      $_XOR_                        260
@@ -94,23 +94,23 @@
 
 === cache_controller ===
 
-   Number of wires:               2920
-   Number of wire bits:           4907
+   Number of wires:               2919
+   Number of wire bits:           4906
    Number of public wires:          78
    Number of public wire bits:    1424
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:               3873
-     $_ANDNOT_                     284
-     $_AND_                        171
+   Number of cells:               3872
+     $_ANDNOT_                     283
+     $_AND_                        172
      $_DFFE_PP_                    224
      $_DFF_P_                        3
      $_MUX_                        754
      $_NAND_                       155
      $_NOR_                         24
      $_NOT_                         40
-     $_ORNOT_                       20
+     $_ORNOT_                       19
      $_OR_                         826
      $_SDFFE_PP0N_                  32
      $_SDFFE_PP0P_                 318
@@ -170,28 +170,28 @@
      prefetch_engine                 1
        $paramod$6059306f263e7c9ba9c9d43c005c764c102b254b\stride_predictor      1
 
-   Number of wires:              58153
-   Number of wire bits:         101466
+   Number of wires:              58370
+   Number of wire bits:         101683
    Number of public wires:         814
    Number of public wire bits:   43024
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              99234
-     $_ANDNOT_                    3046
-     $_AND_                        303
+   Number of cells:              99471
+     $_ANDNOT_                    3063
+     $_AND_                        298
      $_DFFE_PP_                  38894
      $_DFF_P_                        6
-     $_MUX_                      47858
+     $_MUX_                      48048
      $_NAND_                       340
-     $_NOR_                        279
-     $_NOT_                        280
-     $_ORNOT_                      307
-     $_OR_                        4236
+     $_NOR_                        283
+     $_NOT_                        275
+     $_ORNOT_                      329
+     $_OR_                        4230
      $_SDFFCE_PN0P_                394
      $_SDFFCE_PN1P_                256
      $_SDFFE_PP0N_                  68
-     $_SDFFE_PP0P_                 781
+     $_SDFFE_PP0P_                 801
      $_SDFF_PP0_                   372
      $_XNOR_                       172
      $_XOR_                       1642

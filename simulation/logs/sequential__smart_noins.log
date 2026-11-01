@@ -1,4 +1,4 @@
 vvp -n simulation/build/sim.vvp +trace=traces/sequential.trace +tag=smart_noins +mode=3 +adaptive=1 +degree=2 +inslru=0
 RESULT tag=smart_noins trace=traces/sequential.trace mode=3 adaptive=1 degree=2 inslru=0 accesses=8192 hits=8145 misses=47 dem_mem=8 pf_issued=2040 pf_useful=2001 pf_late=39 pf_evict_unused=0 pf_resident_unused=0 pf_filtered=11607 cand_pushed=13647 final_degree=7 cycles=29172 total_latency=8761 miss_latency_sum=616 max_latency=42 errors=0
 TEST PASSED
-testbench/tb_system.v:186: $finish called at 291776000 (1ps)
+testbench/tb_system.v:189: $finish called at 291776000 (1ps)

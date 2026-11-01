@@ -66,6 +66,7 @@ module tb_system;
     integer errors, issue_cycle, start_cycle, end_cycle, lat, max_lat, timeout;
     integer total_lat, miss_lat_sum, miss_cnt_tb, resident_unused, dups;
     reg     hit_now;
+    reg     misslog;
 
     initial begin
         // ---------------- configuration ----------------
@@ -75,6 +76,7 @@ module tb_system;
         if (!$value$plusargs("degree=%d", degree))     degree = 3'd2;
         if (!$value$plusargs("inslru=%d", inslru))     inslru = 1'b1;
         if (!$value$plusargs("tag=%s", tag))           tag = "run";
+        misslog = $test$plusargs("misslog");   // print every slow load (analysis only)
 
         // ---------------- load trace -------------------
         n = 0;
@@ -134,6 +136,7 @@ module tb_system;
             total_lat = total_lat + lat;
             if (lat > 1) begin miss_lat_sum = miss_lat_sum + lat; miss_cnt_tb = miss_cnt_tb + 1; end
             if (lat > max_lat) max_lat = lat;
+            if (misslog && lat > 1) $display("MISS %0d %h %0d", k, tr_addr[k], lat);
             if (cpu_resp_data !== expected_word(tr_addr[k])) begin
                 errors = errors + 1;
                 if (errors < 10)

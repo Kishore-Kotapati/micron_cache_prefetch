@@ -2,7 +2,7 @@
      -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:233  in gpi_load_users                  Running entry func 'initialize' from loaded library '/usr/local/lib/python3.13/dist-packages/cocotb/simulator.cpython-313-x86_64-linux-gnu.so'
      -.--ns INFO     pygpi                              ..ib/pygpi/embed.cpp:114  in initialize                      Using Python 3.13.8 interpreter at /usr/local/bin/python3
      -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:74   in gpi_print_registered_impl       GPI: VPI support registered
-     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1793523857
+     0.00ns INFO     cocotb.initialize                  Seeding Python random module with 1793525465
      0.00ns INFO     cocotb.initialize                  Initialized cocotb v2.1.0 from /usr/local/lib/python3.13/site-packages/cocotb
      0.00ns INFO     cocotb.initialize                  Running on Icarus Verilog version 12.0 (stable)
      0.00ns INFO     cocotb.regression                  Running tests
@@ -36,14 +36,14 @@
 708665.01ns INFO     cocotb.regression                  *****************************************************************************************************
                                                         ** TEST                                         STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
                                                         *****************************************************************************************************
-                                                        ** test_cache.test_hit_and_miss_latency          PASS         535.00           0.00     175193.29  **
-                                                        ** test_cache.test_lru_replacement               PASS        2665.00           0.01     281031.97  **
-                                                        ** test_cache.test_random_vs_golden_model        PASS      417905.00           1.44     289961.31  **
-                                                        ** test_cache.test_prefetch_removes_misses       PASS       22815.00           0.14     166593.13  **
-                                                        ** test_cache.test_demand_during_prefetch        PASS        2715.00           0.02     162938.80  **
-                                                        ** test_cache.test_no_prefetch_across_page       PASS        4385.00           0.03     134810.20  **
-                                                        ** test_cache.test_random_traffic_is_throttled   PASS      257645.00           1.22     211774.12  **
+                                                        ** test_cache.test_hit_and_miss_latency          PASS         535.00           0.01     106126.60  **
+                                                        ** test_cache.test_lru_replacement               PASS        2665.00           0.01     189409.03  **
+                                                        ** test_cache.test_random_vs_golden_model        PASS      417905.00           1.99     209851.69  **
+                                                        ** test_cache.test_prefetch_removes_misses       PASS       22815.00           0.12     187207.57  **
+                                                        ** test_cache.test_demand_during_prefetch        PASS        2715.00           0.02     177784.72  **
+                                                        ** test_cache.test_no_prefetch_across_page       PASS        4385.00           0.03     127991.14  **
+                                                        ** test_cache.test_random_traffic_is_throttled   PASS      257645.00           0.98     263184.91  **
                                                         *****************************************************************************************************
-                                                        ** TESTS=7 PASS=7 FAIL=0 SKIP=0                            708665.01           2.86     247914.84  **
+                                                        ** TESTS=7 PASS=7 FAIL=0 SKIP=0                            708665.01           3.16     224022.90  **
                                                         *****************************************************************************************************
 results: results/cocotb_results.xml

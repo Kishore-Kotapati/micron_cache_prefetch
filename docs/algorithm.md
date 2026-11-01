@@ -53,8 +53,9 @@ sequential 2.75× → 3.85×, stride 2.69× → 5.20×.
 ### (b) Hybrid next-line kick-off for new streams  *(Novel Prediction Algorithm, AI-aware)*
 Recommendation embedding rows are only 64 B (4 lines): the stride detector
 needs ~5 accesses to train, so most of the row is gone before it fires.  When a
-**new** stream starts **with a miss**, the predictor immediately issues 2
-next-line prefetches. The kick-off is **gated by the measured accuracy**
+**new** stream starts **with a miss**, or a known stream **jumps** (breaks its
+stride) on a miss — e.g. a CNN moving to the next feature-map row — the
+predictor immediately issues 2 next-line prefetches while the stride re-trains. The kick-off is **gated by the measured accuracy**
 (below 50 % it is switched off), so pure random traffic costs only one epoch of
 wasted prefetches (32 out of 3 989 misses) instead of doubling DRAM traffic
 like a plain next-line prefetcher does.
@@ -81,9 +82,10 @@ is adaptive.
 ## 6. Which strategy suits which AI-inspired workload (measured)
 
 * **CNN** (line-buffer row streams + channel-strided pointwise conv): stride
-  with high degree; next-line cannot follow the 256 B channel stride. 2.02× vs 1.73×.
+  with high degree, plus the re-sync kick-off at every new feature-map row;
+  next-line cannot follow the 256 B channel stride. 2.18× vs 1.73×.
 * **LLM** (GEMV weight streaming + KV-cache scans): long, perfectly regular
   streams; adaptive degree reaches 7 and removes 97 % of misses. 2.76× vs 1.89×.
 * **Recommendation** (Zipf embedding lookups, 4-line rows): short irregular
-  bursts; the hybrid kick-off is what helps. 1.46× vs 1.45× next-line, 1.34×
-  plain stride.
+  bursts; the hybrid kick-off plus adaptive insertion is what helps. 1.46× vs
+  1.45× next-line, 1.34× plain stride.

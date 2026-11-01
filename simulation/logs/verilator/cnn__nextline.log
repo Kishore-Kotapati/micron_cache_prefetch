@@ -1,4 +1,4 @@
 /home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/cnn.trace +tag=nextline +mode=1 +adaptive=0 +degree=1 +inslru=0
 RESULT tag=nextline trace=traces/cnn.trace mode=1 adaptive=0 degree=1 inslru=0 accesses=8560 hits=7411 misses=1149 dem_mem=183 pf_issued=1675 pf_useful=554 pf_late=966 pf_evict_unused=155 pf_resident_unused=0 pf_filtered=25 cand_pushed=1700 final_degree=1 cycles=65079 total_latency=30708 miss_latency_sum=23297 max_latency=44 errors=0
 TEST PASSED
-- testbench/tb_system.v:186: Verilog $finish
+- testbench/tb_system.v:189: Verilog $finish

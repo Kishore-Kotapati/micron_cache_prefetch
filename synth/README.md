@@ -26,15 +26,15 @@ ports, which is where a real memory controller would connect.
 |---|---|---|
 | cache_memory (4 KB data) | 65,968 | 32,768 |
 | tag_array (tags + valid + prefetched bits) | 22,953 | 6,144 |
-| cache_controller (FSM, 8 MSHRs, counters) | 3,873 | 634 |
+| cache_controller (FSM, 8 MSHRs, counters) | 3,872 | 634 |
 | replacement_policy (LRU ages) | 1,855 | 512 |
-| stride_predictor (stream table, adaptive logic) | 2,587 | 289 |
+| stride_predictor (stream table, adaptive logic) | 2,825 | 309 |
 | prefetch_engine (generator + queue) | 2,002 | 424 |
-| **Total** | **99,234** | **40,771** |
+| **Total** | **99,471** | **40,791** |
 
-The whole prefetch engine (predictor + queue) is **4,589 cells (4.6 %)** and
-**713 flip-flops (1.7 %)** of the design. Almost all hardware is the cache
-storage itself, so the 2.23× speedup costs very little extra logic.
+The whole prefetch engine (predictor + queue) is **4,827 cells (4.9 %)** and
+**733 flip-flops (1.8 %)** of the design. Almost all hardware is the cache
+storage itself, so the 2.26× speedup costs very little extra logic.
 
 `check -assert` passes (no combinational loops, no multiple drivers).
 

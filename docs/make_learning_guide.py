@@ -200,7 +200,7 @@ for i, t in enumerate(["The project in one page", "Background: why memory is the
                        "How a cache works", "What prefetching is", "Our system - the big picture",
                        "The life of one load (step by step)", "The prediction engine in detail",
                        "Our three innovations", "The workloads (test inputs)", "How we proved it works",
-                       "Results and how to read them", "Hardware size (synthesis)",
+                       "Results and how to read them", "Going further: perfect cache, slow DRAM, tuning", "Hardware size (synthesis)",
                        "Every file explained", "How to run everything", "Demo script for the judges",
                        "Questions judges may ask (with answers)", "Limitations and future work", "Glossary"], 1):
     p(f"{i}. {t}")
@@ -225,7 +225,8 @@ bl(["A <b>cache</b> (4 KB, 4-way, 16-byte lines) written in Verilog - the hardwa
 table([["Question", "Answer"],
        ["How much faster?", f"{GM_ALL:.2f}x average over 9 workloads, {GM_AI:.2f}x on AI-inspired ones, up to {R('stride','smart').speedup:.1f}x"],
        ["Is it correct?", "54/54 simulations pass; matches Python model exactly; identical on 2 simulators; 7/7 Cocotb tests"],
-       ["How big is the prefetcher?", "4.6 % of the logic, 1.7 % of the flip-flops"],
+       ["How big is the prefetcher?", "4.9 % of the logic, 1.8 % of the flip-flops"],
+       ["Slower DRAM (120 cycles)?", "3.03x average, 2.97x on AI-inspired workloads"],
        ["Tools", "Python 3, Icarus Verilog, GTKWave, Git, Verilator, Cocotb, Pandas, Matplotlib (+ Yosys)"]],
       [4.5, 12])
 story.append(PageBreak())
@@ -392,14 +393,18 @@ table([["Measured accuracy (last 32 prefetches)", "Action"],
 p(f"Effect (fixed degree 2 -> adaptive): sequential {R('sequential','stride').speedup:.2f}x -> {R('sequential','stride_adapt').speedup:.2f}x, "
   f"stride {R('stride','stride').speedup:.2f}x -> {R('stride','stride_adapt').speedup:.2f}x, average "
   f"{gm('stride',ORDER):.2f}x -> {gm('stride_adapt',ORDER):.2f}x. This is the biggest single gain.")
-h2("Innovation 2 - hybrid quick start for new streams  (slide: Novel Prediction Algorithms, AI-Aware)")
+h2("Innovation 2 - hybrid quick start for new or jumping streams  (slide: Novel Prediction Algorithms, AI-Aware)")
 p("Recommendation models read short embedding rows (64 bytes = 4 lines) at random places. The stride detector needs "
-  "about 5 loads to become sure, so the row is almost finished before it helps. Fix: when a <b>new</b> stream starts "
-  "with a <b>miss</b>, immediately prefetch the next 2 lines. To stop this from wasting bandwidth on random data, it is "
-  "switched <b>off while measured accuracy is below 50 %</b>.")
-p(f"Effect: recsys {R('recsys','stride_adapt').speedup:.2f}x -> {R('recsys','smart').speedup:.2f}x (now better than next-line's "
-  f"{R('recsys','nextline').speedup:.2f}x). On pure random data only {int(R('random','smart').prefetch_dram)} prefetches are issued "
-  f"in total, while a plain next-line prefetcher doubles DRAM traffic.")
+  "about 5 loads to become sure, so the row is almost finished before it helps. The same happens in a CNN each time it "
+  "moves to the next feature-map row: the stream <i>jumps</i> and has to re-learn. Fix: when a <b>new</b> stream starts "
+  "with a <b>miss</b>, or a known stream <b>jumps</b> on a miss, immediately prefetch the next 2 lines while the stride "
+  "re-trains. To stop this from wasting bandwidth on random data, it is switched <b>off while measured accuracy is below 50 %</b>.")
+p(f"Effect (adding this idea): CNN {R('cnn','stride_adapt').speedup:.2f}x -> {R('cnn','smart_noins').speedup:.2f}x, "
+  f"recsys {R('recsys','stride_adapt').speedup:.2f}x -> {R('recsys','smart_noins').speedup:.2f}x, "
+  f"repeated {R('repeated','stride_adapt').speedup:.2f}x -> {R('repeated','smart_noins').speedup:.2f}x. "
+  f"On pure random data only {int(R('random','smart').prefetch_dram)} prefetches are issued in total, while a plain "
+  f"next-line prefetcher doubles DRAM traffic. The jump case was found by logging every slow CNN load and seeing that "
+  f"the first two lines of each new row always missed.")
 h2("Innovation 3 - adaptive insertion  (slide: Adaptive Cache Policies)")
 p("When guesses are poor (accuracy below 50 %), new prefetched lines are inserted as the <b>oldest</b> line in their set, "
   "so a wrong guess is the first thing thrown out and cannot push out useful data. When guesses are good they are "
@@ -477,7 +482,7 @@ bl(["<b>Long regular streams</b> (sequential, capacity, LLM): almost every miss 
     "<b>stride</b>: 5.2x faster even though most prefetches are 'late': the CPU wants a new line every ~3.5 cycles "
     "but DRAM accepts one only every 4, so this run is limited by DRAM bandwidth.",
     "<b>random</b>: nothing can be predicted; the design correctly stays quiet (1.00x, almost no extra traffic).",
-    "<b>repeated</b>: everything already fits in the cache, so there is nothing to gain (1.01x).",
+    "<b>repeated</b>: everything already fits in the cache; only the 96 first-touch misses can be helped (1.08x).",
     "<b>CNN, recsys, mixed</b>: real speedups, paid for with more DRAM traffic (about 1.4-1.8x)."])
 h2("Comparing all strategies (average speedup)")
 table([["Architecture", "All 9 traces", "AI-inspired (cnn, llm, recsys)"]] +
@@ -486,22 +491,55 @@ table([["Architecture", "All 9 traces", "AI-inspired (cnn, llm, recsys)"]] +
 p("smart = final design. Each row adds one idea to the row above, which shows how much every idea contributes.")
 story.append(PageBreak())
 
+# ------------------------------------------------------------------ 12 (going further)
+h1("12. Going further: perfect cache, slow DRAM, tuning")
+h2("How close are we to a perfect cache?")
+p("A 'perfect' cache would answer every load in 1 cycle. Because the CPU model is the same, its run time can be "
+  "computed exactly from the baseline run. This tells us how much of the <i>possible</i> gain we achieved.")
+gap_rows = [["Trace", "Speedup now", "Max possible", "Share of possible gain"]]
+for t in ORDER:
+    a, b = R(t, "baseline"), R(t, "smart")
+    ideal = a.cycles - a.amat_measured * a.accesses + a.accesses
+    gap_rows.append([t, f"{b.speedup:.2f}x", f"{a.cycles/ideal:.2f}x", f"{100*(a.cycles-b.cycles)/(a.cycles-ideal):.0f} %"])
+table(gap_rows, [3.5, 3.5, 3.5, 4.5])
+p("Regular streams (sequential, capacity, LLM) reach 98-99 % of perfect: nothing left to win. Random addresses cannot be "
+  "predicted by anyone (0 %), which also limits mixed and recsys. stride is limited by DRAM bandwidth.")
+lat = pd.read_csv(os.path.join(ROOT, "results", "latency_sweep.csv"))
+h2("What if DRAM is slower?")
+p("Real DRAM is usually more than 100 CPU cycles away. We re-ran everything with 20, 40, 80 and 120-cycle DRAM "
+  "(only the DRAM model changes):")
+table([["DRAM latency", "Average speedup (9 traces)", "AI-inspired (cnn, llm, recsys)"]] +
+      [[f"{L} cycles", f"{math.exp(lat[lat.latency==L].speedup.map(math.log).mean()):.2f}x",
+        f"{math.exp(lat[(lat.latency==L)&lat.trace.isin(['cnn','llm','recsys'])].speedup.map(math.log).mean()):.2f}x"]
+       for L in sorted(lat.latency.unique())], [4, 5.5, 6])
+img(os.path.join(ROOT, "results", "plots", "latency_sweep.png"), 13, "The slower the memory, the more the prefetcher helps.")
+sw = pd.read_csv(os.path.join(ROOT, "results", "design_sweep.csv"))
+h2("Is the design tuned to death? - design-space exploration")
+p(f"We tried 16 combinations of its settings (stream-table size, confidence threshold, quick-start length, accuracy "
+  f"window). All 16 give between {sw.gm_all.min():.2f}x and {sw.gm_all.max():.2f}x: the design is robust, not fragile. "
+  "The best one was under 1 % better and was tuned on the same traces, so we kept the simple defaults (no overfitting).")
+h2("An idea we tested and rejected")
+p("CNN channels 256 bytes apart all fall into the same 4 cache sets. Mixing higher address bits into the set number "
+  "(XOR hashing) made CNN 3.4 % faster but recsys 1.3 % slower, and it changes the baseline cache too, so it was not "
+  "adopted. Testing ideas and keeping only clear wins is part of good engineering.")
+story.append(PageBreak())
+
 # ------------------------------------------------------------------ 12
-h1("12. Hardware size (synthesis)")
+h1("13. Hardware size (synthesis)")
 p("Yosys (a free synthesis tool) turned the Verilog into logic gates. This shows the design is real, buildable "
   "hardware, and how much each part costs.")
 table([["Block", "Logic cells", "Flip-flops"],
        ["cache data (4 KB)", "65,968", "32,768"], ["tags + valid + prefetched bits", "22,953", "6,144"],
-       ["cache controller", "3,873", "634"], ["LRU replacement", "1,855", "512"],
-       ["<b>prefetch engine (predictor + queue)</b>", "<b>4,589 (4.6 %)</b>", "<b>713 (1.7 %)</b>"],
-       ["<b>total</b>", "<b>99,234</b>", "<b>40,771</b>"]], [7, 4.5, 4.5])
+       ["cache controller", "3,872", "634"], ["LRU replacement", "1,855", "512"],
+       ["<b>prefetch engine (predictor + queue)</b>", "<b>4,827 (4.9 %)</b>", "<b>733 (1.8 %)</b>"],
+       ["<b>total</b>", "<b>99,471</b>", "<b>40,791</b>"]], [7, 4.5, 4.5])
 note("The 'intelligence' is under 5 % of the hardware; almost everything is the cache storage itself. "
      "These are generic gates - no chip area, clock speed, power or placement is claimed.")
 img(os.path.join(ROOT, "synth", "block_top.png"), 16, "Yosys drawing of how the cache controller and prefetch engine are wired.")
 story.append(PageBreak())
 
 # ------------------------------------------------------------------ 13
-h1("13. Every file explained")
+h1("14. Every file explained")
 table([["File / folder", "What it is"],
        ["rtl/top_module.v", "connects cache, prefetch engine and DRAM; run-time settings pf_mode (0 base, 1 next-line, 2 stride, 3 final), adaptive, degree, insertion"],
        ["rtl/cache_controller.v", "demand FSM, MSHR table, prefetch probe/filter, arbitration, performance counters"],
@@ -527,7 +565,7 @@ table([["File / folder", "What it is"],
 story.append(PageBreak())
 
 # ------------------------------------------------------------------ 14
-h1("14. How to run everything")
+h1("15. How to run everything")
 p("In Ubuntu (WSL), with the tools installed as described in README.md:")
 code("""cd ~/micron_cache_prefetch
 bash run_all.sh                 # traces, lint, 54 sims, Verilator check, Cocotb, plots (~1 min)
@@ -553,7 +591,7 @@ p("Reading a RESULT line: <i>hits, misses</i> = CPU loads; <i>dem_mem</i> = DRAM
   "<i>cycles</i> = total run time; <i>errors</i> must be 0.")
 
 # ------------------------------------------------------------------ 15
-h1("15. Demo script for the judges (about 5 minutes)")
+h1("16. Demo script for the judges (about 5 minutes)")
 table([["Step", "Show", "Say"],
        ["1", "slide 1 / section 1 of this guide", "AI waits for memory; we built a cache that guesses and fetches early"],
        ["2", "bash run_all.sh running", "54 simulations, golden model match, identical on two simulators, 7 Cocotb tests"],
@@ -566,24 +604,24 @@ table([["Step", "Show", "Say"],
 story.append(PageBreak())
 
 # ------------------------------------------------------------------ 16
-h1("16. Questions judges may ask (with answers)")
+h1("17. Questions judges may ask (with answers)")
 qa = [
  ("Why did you choose 4-way set associative?", "It removes most conflict misses between interleaved AI streams while needing only 4 tag comparators. Fully associative would need 256."),
  ("How do you know your results are not just a simulator effect?", "The same testbench gives identical numbers on two different simulators (Icarus and Verilator), and the baseline matches an independent Python model exactly."),
  ("How does the prefetcher avoid slowing down normal loads?", "Demand requests always win the DRAM port, one MSHR is always kept for the CPU, and fills never happen in the same cycle as a CPU lookup. The Cocotb test shows an unrelated miss still takes the normal 42 cycles with 3 prefetches in flight."),
  ("What happens on random data?", "Confidence never builds, and the quick-start is switched off by the accuracy gate, so only 32 prefetches are issued over 4000 random loads; speed is unchanged."),
  ("What is a late prefetch, and is it bad?", "The CPU asked while the line was still on its way. It is counted as a miss, but the CPU waits only the remaining time and no second DRAM request is sent, so it still helps."),
- ("Where does the prefetcher lose?", "It costs extra DRAM traffic on CNN and recsys (about 1.4-1.8x), and the adaptive insertion costs 3.5 % on the mixed trace. Both are shown in the results."),
+ ("Where does the prefetcher lose?", "It costs extra DRAM traffic on CNN and recsys (about 1.4-1.8x), and the adaptive insertion costs 3.8 % on the mixed trace. Both are shown in the results."),
  ("Why no program counter (PC) in the predictor?", "Our traces contain only addresses, so streams are separated by address region (1 KB window). A PC-indexed table is listed as future work."),
  ("Is this real hardware?", "Yes: synthesizable Verilog, lint clean, and it synthesizes with Yosys to about 99k gates. We do not claim area or clock speed because no real chip library was used."),
- ("Is it really 'AI-aware'?", "It adapts to the kind of traffic it sees: long regular streams (CNN/LLM) push it to run further ahead, short irregular bursts (recommenders) trigger the quick start, poor accuracy makes it cautious. The traces are synthetic models of these patterns, not real model runs."),
+ ("Is it really 'AI-aware'?", "It adapts to the kind of traffic it sees: long regular streams (CNN/LLM) push it to run further ahead, short irregular bursts (recommenders) and stream jumps (new CNN rows) trigger the quick start, poor accuracy makes it cautious. The traces are synthetic models of these patterns, not real model runs."),
  ("How long did it take to run everything?", "The whole flow (traces, 54 simulations, Verilator check, Cocotb, plots) runs in under a minute."),
 ]
 for q, a in qa:
     story.append(KeepTogether([Paragraph(f"<b>Q: {q}</b>", P), Paragraph(f"A: {a}", B), Spacer(1, 3)]))
 
 # ------------------------------------------------------------------ 17
-h1("17. Limitations and future work")
+h1("18. Limitations and future work")
 table([["Limitation", "Future improvement"],
        ["synthetic traces, not real AI programs", "replay traces captured from real model runs"],
        ["read-only cache (no stores)", "add write-back with dirty bits"],
@@ -595,7 +633,7 @@ table([["Limitation", "Future improvement"],
 story.append(PageBreak())
 
 # ------------------------------------------------------------------ 18
-h1("18. Glossary")
+h1("19. Glossary")
 gl = [("AMAT", "average memory access time = hit time + miss rate x miss penalty"),
       ("Bandwidth", "how many requests DRAM can accept per unit of time"),
       ("Cache line", "the 16-byte block the cache moves at once"),

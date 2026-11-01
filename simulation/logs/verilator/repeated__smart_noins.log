@@ -1,4 +1,4 @@
 /home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/repeated.trace +tag=smart_noins +mode=3 +adaptive=1 +degree=2 +inslru=0
-RESULT tag=smart_noins trace=traces/repeated.trace mode=3 adaptive=1 degree=2 inslru=0 accesses=3840 hits=3748 misses=92 dem_mem=92 pf_issued=6 pf_useful=4 pf_late=0 pf_evict_unused=0 pf_resident_unused=2 pf_filtered=2 cand_pushed=8 final_degree=2 cycles=17193 total_latency=7612 miss_latency_sum=3864 max_latency=42 errors=0
+RESULT tag=smart_noins trace=traces/repeated.trace mode=3 adaptive=1 degree=2 inslru=0 accesses=3840 hits=3774 misses=66 dem_mem=66 pf_issued=32 pf_useful=30 pf_late=0 pf_evict_unused=0 pf_resident_unused=2 pf_filtered=2 cand_pushed=34 final_degree=1 cycles=16127 total_latency=6546 miss_latency_sum=2772 max_latency=42 errors=0
 TEST PASSED
-- testbench/tb_system.v:186: Verilog $finish
+- testbench/tb_system.v:189: Verilog $finish
