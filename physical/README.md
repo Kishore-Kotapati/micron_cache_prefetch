@@ -23,9 +23,9 @@ RTL (rtl/*.v) --Yosys--> sky130 gate netlist --OpenROAD--> placed + routed layou
 * Timing: target clock 10 ns (100 MHz) **not met** – worst slack −4.39 ns,
   so this layout runs at about 14.4 ns ≈ **69 MHz** (typical corner, wire RC estimated from global routing,
   not a full parasitic extraction). The slowest path is inside the stride predictor
-  (`u_pred.tr_addr` → stride compare → `trig_step`); pipelining that compare would be the next step.
+  (the 32-bit `tr_addr - s_last` distance subtraction, built as a ripple-carry chain, → `trig_step`); pipelining that compare would be the next step.
 * Power: about 103 mW (OpenROAD estimate with default switching activity).
-* 127 small max-slew warnings (1.52 ns vs a 1.50 ns limit) and 1 max-capacitance warning remain.
+* 126 small max-slew warnings (1.51-1.52 ns vs a 1.50 ns limit) and 1 max-capacitance warning remain.
 
 ## Important: 512 B version
 A 4 KB cache built from flip-flops (≈ 39,000 flip-flops) is too large for a
