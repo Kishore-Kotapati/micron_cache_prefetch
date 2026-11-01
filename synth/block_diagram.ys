@@ -1,0 +1,6 @@
+# Block-level picture of the real design hierarchy (fast).
+read_verilog -sv ../rtl/cache_controller.v ../rtl/tag_array.v ../rtl/cache_memory.v ../rtl/replacement_policy.v ../rtl/stride_predictor.v ../rtl/prefetch_engine.v synth_top.v
+hierarchy -top synth_top
+proc; opt_clean
+show -format svg -prefix block_top -colors 2 -width -stretch synth_top
+show -format svg -prefix block_prefetch -colors 2 -width -stretch prefetch_engine

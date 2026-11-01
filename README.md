@@ -29,6 +29,7 @@ Full numbers: `results/comparison.txt`, `docs/final_report.md`.
 | `simulation/logs/` | one log per simulation (54) |
 | `simulation/waveforms/` | GTKWave demo waveforms + `demo.gtkw` signal layout |
 | `results/` | `performance_summary.csv`, `comparison.txt`, `summary_tables.md`, `trace_analysis.*`, `verilator_lint.txt`, `plots/` |
+| `synth/` | Yosys synthesis: block diagram, gate/flip-flop counts (`bash synth/run_synth.sh`) |
 | `docs/` | `architecture.md`, `algorithm.md`, `final_report.md` |
 
 ## Reproduce everything (one command)
@@ -79,5 +80,5 @@ Verilog 12.0, Verilator 5.020, pandas 3.0, matplotlib 3.11.
 
 ## Honest limitations
 Synthetic traces (not real AI model traces), read-only cache, single cache
-level, simple fixed-latency DRAM model, no synthesis/timing/area numbers. See
+level, simple fixed-latency DRAM model, generic-gate synthesis only (no area/timing/power/placement). See
 `docs/final_report.md` §12.

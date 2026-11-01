@@ -48,8 +48,13 @@ insertion position.
 | `testbench/tb_system.v` | trace-driven CPU model + self-checks | testbench |
 
 Verilator 5.020 `--lint-only -Wall` on the RTL: **0 warnings, 0 errors**
-(`results/verilator_lint.txt`). No synthesis, timing, area or power results
-are claimed — no synthesis was run.
+(`results/verilator_lint.txt`).
+
+**Synthesis check (Yosys 0.33, generic gates, `synth/`):** the design
+synthesizes cleanly (`check -assert` passes) to 99,234 logic cells and 40,771
+flip-flops. The prefetch engine (predictor + queue) is only 4.6 % of the cells
+and 1.7 % of the flip-flops; the rest is cache storage. Generic gates give no
+area, timing or power numbers, and no placement was done.
 
 ## 7. Simulation methodology
 * Icarus Verilog 12.0, `-g2005`. One compiled simulator; the architecture is
@@ -187,14 +192,14 @@ All three share one cheap accuracy monitor (two 6-bit counters).
 * Streams are matched by address region (±1 KB) because traces carry no PC;
   two streams closer than 1 KB would interfere.
 * Simple fixed-latency DRAM (no banks/rows/refresh).
-* No synthesis, timing, area or power numbers (only lint).
+* Generic-gate synthesis only: no standard-cell area, timing, power or placement.
 * Flip-flop arrays (fine for 4 KB; SRAM macros would be needed for large caches).
 
 ## 13. Future improvements
 PC-indexed stride table, write-back support, a multi-bank DRAM model,
 spatial-pattern (bit-vector) prefetching for embedding rows, per-stream
-instead of global accuracy, Cocotb random-constraint tests, Yosys synthesis
-for area/timing.
+instead of global accuracy, Cocotb random-constraint tests, Yosys/OpenROAD flow with
+an SRAM macro for real area, timing and placement.
 
 ## 14. Conclusion
 A working, verified, reproducible RTL cache with an intelligent prefetch engine
