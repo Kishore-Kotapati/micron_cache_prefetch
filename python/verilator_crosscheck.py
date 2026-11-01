@@ -23,6 +23,7 @@ VSIM = os.path.join(OBJ, "vsim")
 
 
 def build():
+    os.makedirs(OBJ, exist_ok=True)          # Verilator does not create parent folders
     src = ["testbench/tb_system.v"] + sorted(
         os.path.join("rtl", f) for f in os.listdir(os.path.join(ROOT, "rtl")) if f.endswith(".v"))
     cmd = ["verilator", "--binary", "--timing", "-j", "0", "-Wno-fatal", "-Wno-lint", "-Wno-style",
