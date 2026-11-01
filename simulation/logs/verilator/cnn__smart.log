@@ -1,0 +1,4 @@
+/home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/cnn.trace +tag=smart +mode=3 +adaptive=1 +degree=2 +inslru=1
+RESULT tag=smart trace=traces/cnn.trace mode=3 adaptive=1 degree=2 inslru=1 accesses=8560 hits=8167 misses=393 dem_mem=274 pf_issued=2105 pf_useful=1317 pf_late=119 pf_evict_unused=669 pf_resident_unused=0 pf_filtered=11870 cand_pushed=13975 final_degree=7 cycles=55596 total_latency=21225 miss_latency_sum=13058 max_latency=44 errors=0
+TEST PASSED
+- testbench/tb_system.v:186: Verilog $finish

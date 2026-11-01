@@ -2,3 +2,6 @@ simulation/build/
 __pycache__/
 *.vcd
 !simulation/waveforms/*.vcd
+simulation/cocotb_build/
+simulation/verilator/
+sim_build/

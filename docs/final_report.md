@@ -94,6 +94,30 @@ timing, so the RTL baseline is compared with an independent Python LRU model
 
 Result: **54 / 54 simulations passed all self-checks.**
 
+**Second simulator (Verilator 5.020, `python/verilator_crosscheck.py`):** the
+same testbench and RTL compiled with `verilator --binary --timing` give
+results **identical to Icarus in all 54 runs** — every counter, every cycle
+count and every self-check (`results/verilator_crosscheck.txt`). Two
+independent simulators agreeing means the results do not depend on one
+simulator's event ordering.
+
+**Cocotb tests (Cocotb 2.1 on Icarus, `testbench/cocotb/test_cache.py`) — 7/7 PASS:**
+
+| Test | What it proves | Measured |
+|---|---|---|
+| hit_and_miss_latency | cold miss pays DRAM latency, rest of line hits in 1 cycle | miss 42 cyc, hit 1 cyc |
+| lru_replacement | 5 lines in one 4-way set: the LRU line is the one evicted | pass |
+| random_vs_golden_model | 1500 constrained-random loads, hits/misses equal Python model | 554 / 946, exact match |
+| prefetch_removes_misses | 128-line stream: demand DRAM requests 128 → 1 | 22 misses (21 late merges), 1 demand request |
+| demand_during_prefetch | load to an in-flight prefetched line merges (no 2nd DRAM request); unrelated miss not delayed while 3 prefetches are in flight | merge waited 11 cyc; miss 42 cyc |
+| no_prefetch_across_page | stream ending at a 4 KB boundary never prefetches into the next page | 30 issued, 0 across |
+| random_traffic_is_throttled | 600 random loads → accuracy gate limits waste | 32 prefetches |
+
+Two of these tests failed on their first run because the test itself was wrong
+(a too-strict miss limit that counted late merges as full misses, and a merge
+test that loaded a line which had already arrived). The tests were corrected
+to check the intended behaviour; the RTL was not changed.
+
 ## 9. Waveform observations (GTKWave, `simulation/waveforms/demo_final.vcd`)
 Demo trace: 96 sequential loads then 2 random loads.
 * First lines miss; the stream entry reaches confidence 2 after a few lines,
@@ -198,13 +222,13 @@ All three share one cheap accuracy monitor (two 6-bit counters).
 ## 13. Future improvements
 PC-indexed stride table, write-back support, a multi-bank DRAM model,
 spatial-pattern (bit-vector) prefetching for embedding rows, per-stream
-instead of global accuracy, Cocotb random-constraint tests, Yosys/OpenROAD flow with
+instead of global accuracy, Yosys/OpenROAD flow with
 an SRAM macro for real area, timing and placement.
 
 ## 14. Conclusion
 A working, verified, reproducible RTL cache with an intelligent prefetch engine
 was built from scratch with only Python, Icarus Verilog, GTKWave and Git
-(+ Verilator, Pandas, Matplotlib). Across 9 workloads it is **2.23× faster
+(+ Verilator, Cocotb, Pandas, Matplotlib). Across 9 workloads it is **2.23× faster
 (geometric mean)** than the same cache without prefetching, **2.01× on the
 AI-inspired workloads**, never slower than the baseline, and every reported
 number comes from a passing, self-checked simulation.

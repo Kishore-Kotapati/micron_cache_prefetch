@@ -1,0 +1,4 @@
+/home/claude/micron_cache_prefetch/simulation/verilator/obj/vsim +trace=traces/llm.trace +tag=stride +mode=2 +adaptive=0 +degree=2 +inslru=0
+RESULT tag=stride trace=traces/llm.trace mode=2 adaptive=0 degree=2 inslru=0 accesses=8320 hits=7766 misses=554 dem_mem=14 pf_issued=1298 pf_useful=746 pf_late=540 pf_evict_unused=12 pf_resident_unused=0 pf_filtered=2717 cand_pushed=4015 final_degree=2 cycles=34353 total_latency=13650 miss_latency_sum=5884 max_latency=42 errors=0
+TEST PASSED
+- testbench/tb_system.v:186: Verilog $finish

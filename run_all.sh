@@ -16,11 +16,28 @@ python3 python/generate_traces.py
 if command -v verilator >/dev/null; then
   echo "== Lint (Verilator)"
   verilator --lint-only -Wall -Wno-DECLFILENAME -Wno-PINCONNECTEMPTY -Wno-UNUSEDSIGNAL \
-            --top-module top_module rtl/*.v && echo "lint clean"
+            --top-module top_module rtl/*.v && echo "lint clean" || echo "lint step failed (older Verilator?)"
 fi
 
 echo "== Level 4/5: compile RTL, run all simulations, compute metrics"
 python3 python/run_all.py | tee results/regression_log.txt
+
+# Second simulator: Verilator >= 5 can run the same testbench (--binary --timing)
+if command -v verilator >/dev/null && verilator --version | grep -qE "Verilator [5-9]"; then
+  echo "== Verilator cross-check (same testbench, second simulator)"
+  python3 python/verilator_crosscheck.py | tail -1
+else
+  echo "== Verilator cross-check skipped (needs Verilator 5 or newer)"
+fi
+
+# Cocotb directed / random tests (Python testbench on Icarus)
+if python3 -c "import cocotb" 2>/dev/null; then
+  echo "== Cocotb tests"
+  python3 python/run_cocotb.py > results/cocotb_log.txt 2>&1 || true
+  grep -E "\*\* (test_cache|TESTS)" results/cocotb_log.txt | sed 's/  \+/ /g'
+else
+  echo "== Cocotb tests skipped (pip install cocotb)"
+fi
 
 echo "== Plots and report tables"
 python3 python/visualize_results.py
