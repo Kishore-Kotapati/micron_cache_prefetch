@@ -29,7 +29,9 @@ def build():
            "--top-module", "tb_system", "-Mdir", "simulation/verilator/obj", "-o", "vsim"] + src
     p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
     if p.returncode != 0 or not os.path.exists(VSIM):
-        print(p.stdout[-3000:], p.stderr[-3000:]); sys.exit("VERILATOR BUILD FAILED")
+        print("verilator stdout:\n" + p.stdout[-3000:] + "\nverilator stderr:\n" + p.stderr[-3000:])
+        print("Hint: Verilator needs a C++ compiler -> sudo apt install -y build-essential")
+        sys.exit("VERILATOR BUILD FAILED")
     ver = subprocess.run(["verilator", "--version"], capture_output=True, text=True).stdout.strip()
     print("build OK:", ver)
     return ver

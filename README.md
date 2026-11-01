@@ -76,30 +76,25 @@ gtkwave simulation/waveforms/demo_final.vcd simulation/waveforms/demo.gtkw
 ```
 Each run prints a `RESULT ...` line and `TEST PASSED` or `TEST FAILED`.
 
-## Tool setup (Ubuntu / WSL)
-Ubuntu 22.04's packaged Verilator (4.x) and Icarus (11) are too old for the
-Verilator simulation step, so install the free OSS CAD Suite (Icarus,
-Verilator 5, GTKWave, Yosys in one folder) **inside WSL**, and Cocotb with pip:
+## Tool setup (Ubuntu 24.04 / WSL) - recommended
+Ubuntu 24.04's own packages have exactly the versions used for the reported
+results. Verilator needs a C++ compiler (build-essential) because it turns
+the Verilog into a C++ program.
 
 ```bash
 sudo apt update
-sudo apt install -y git python3 python3-venv python3-pip graphviz wget unzip
-cd ~
-wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-02-02/oss-cad-suite-linux-x64-20260202.tgz
-tar -xzf oss-cad-suite-linux-x64-20260202.tgz        # creates ~/oss-cad-suite
-/usr/bin/python3 -m venv ~/hackenv
-echo 'export PATH="$HOME/oss-cad-suite/bin:$PATH"; source $HOME/hackenv/bin/activate' >> ~/.bashrc
-source ~/.bashrc
-pip install cocotb pandas matplotlib
-iverilog -V | head -1; verilator --version; yosys -V; python3 -c "import cocotb; print(cocotb.__version__)"
+sudo apt install -y iverilog gtkwave git python3 python3-venv python3-pip \
+                    python3-pandas python3-matplotlib verilator build-essential yosys graphviz unzip
+python3 -m venv --system-site-packages ~/hackenv
+source ~/hackenv/bin/activate
+pip install cocotb
+cd ~/micron_cache_prefetch && bash run_all.sh
 ```
-Then `cd ~/micron_cache_prefetch && bash run_all.sh`. Steps whose tool is
-missing are skipped with a message, so the core flow also works with only
-`iverilog`, `python3`, pandas and matplotlib.
+(Open a new terminal later with `source ~/hackenv/bin/activate` before running.)
 
-The `oss-cad-suite` folder extracted on the Windows drive does not run
-(Linux build, and Windows extraction breaks its links) — use the copy downloaded
-inside WSL.
+On Ubuntu 22.04 the packaged Verilator is too old for the second-simulator
+step; there, use the OSS CAD Suite release (`source ~/oss-cad-suite/environment`).
+Steps whose tool is missing are skipped with a message.
 
 Versions used for the reported results: Ubuntu 24.04, Python 3.13, Icarus
 Verilog 12.0, Verilator 5.020, Cocotb 2.1.0, Yosys 0.33, pandas 3.0,
