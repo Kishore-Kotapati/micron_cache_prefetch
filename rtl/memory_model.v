@@ -58,7 +58,7 @@ module memory_model #(
     integer w;
     always @* begin
         for (w = 0; w < WORDS; w = w + 1)
-            resp_data[w*32 +: 32] = mem_word((q_line[head] << OFF_W) | (w << 2));
+            resp_data[w*32 +: 32] = mem_word({q_line[head], {OFF_W{1'b0}}} | (w << 2));
     end
 
     always @(posedge clk) begin
@@ -78,7 +78,7 @@ module memory_model #(
             end
             if (pop)
                 head <= head + 1'b1;
-            count <= count + (push ? 1'b1 : 1'b0) - (pop ? 1'b1 : 1'b0);
+            count <= count + {{PTR_W{1'b0}}, push} - {{PTR_W{1'b0}}, pop};
         end
     end
 endmodule

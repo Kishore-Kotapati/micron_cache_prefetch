@@ -7,10 +7,11 @@
 //                  prefetch_engine (stride_predictor + queue)
 //
 // Run-time configuration (same RTL for every architecture compared):
-//   pf_mode       0 = baseline (no prefetch), 1 = next-line, 2 = stride
+//   pf_mode       0 = baseline (no prefetch), 1 = next-line, 2 = stride,
+//                 3 = hybrid stride (final design)
 //   pf_adaptive   1 = accuracy-feedback degree control
 //   pf_degree     base / fixed prefetch degree (1..4)
-//   pf_insert_lru 1 = prefetch-aware LRU insertion
+//   pf_insert_lru 1 = adaptive prefetch-aware insertion (LRU when accuracy low)
 // The design part is cache_controller + prefetch_engine (synthesizable);
 // memory_model is a behavioural DRAM used only for simulation.
 // ============================================================================
@@ -52,6 +53,7 @@ module top_module #(
     wire               cand_valid, cand_pop, fb_issued, fb_useful;
     wire [LADDR_W-1:0] cand_line;
     wire [2:0]         pf_cur_degree;
+    wire               pf_low_acc;
 
     cache_controller #(
         .ADDR_W(ADDR_W), .LINE_BYTES(LINE_BYTES), .SETS(SETS), .WAYS(WAYS), .NMSHR(NMSHR)
@@ -68,7 +70,7 @@ module top_module #(
         .train_miss(train_miss), .train_pfhit(train_pfhit),
         .cand_valid(cand_valid), .cand_line(cand_line), .cand_pop(cand_pop),
         .fb_issued(fb_issued), .fb_useful(fb_useful),
-        .pf_insert_lru(pf_insert_lru),
+        .pf_insert_lru(pf_insert_lru), .pf_low_accuracy(pf_low_acc),
         .cnt_access(), .cnt_hit(), .cnt_miss(), .cnt_dem_mem(), .cnt_pf_issued(),
         .cnt_pf_useful(), .cnt_pf_late(), .cnt_pf_evict_unused(), .cnt_pf_filtered(),
         .cnt_fills(), .mshr_busy()
@@ -83,7 +85,7 @@ module top_module #(
         .train_miss(train_miss), .train_pfhit(train_pfhit),
         .fb_issued(fb_issued), .fb_useful(fb_useful),
         .cand_valid(cand_valid), .cand_line(cand_line), .cand_pop(cand_pop),
-        .degree(pf_cur_degree),
+        .degree(pf_cur_degree), .low_accuracy(pf_low_acc),
         .cnt_cand_pushed(), .cnt_cand_dup(), .cnt_page_stop()
     );
 

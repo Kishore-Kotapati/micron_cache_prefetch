@@ -17,11 +17,12 @@
 //         rounded up to one line in the stream direction.
 //
 // Modes : 0 = off, 1 = next-line (classic sequential, on miss/prefetch-hit),
-//         2 = stride (this design).
+//         2 = stride, 3 = hybrid (stride + next-line kick-off for new streams).
 //
 // Adaptive degree (innovation): every EPOCH issued prefetches the hit-rate of
 // those prefetches is checked.  >= 75 % useful -> degree+1 (up to DEG_MAX),
-// < 50 % useful -> degree-1 (down to 1).  This throttles the prefetcher on
+// < 25 % useful -> degree-1 (down to 1).  < 50 % useful also raises the
+// low_accuracy flag used by the adaptive cache-insertion policy.  This throttles the prefetcher on
 // irregular (recommendation-like) traffic and pushes it further ahead on
 // streaming (CNN/LLM-like) traffic.
 // Synthesizable Verilog-2005.
@@ -33,8 +34,9 @@ module stride_predictor #(
     parameter STR_W      = 12,      // signed stride width (bytes)
     parameter WINDOW     = 1024,    // stream-match window (bytes)
     parameter CONF_TH    = 2,
-    parameter DEG_MAX    = 4,
+    parameter DEG_MAX    = 7,
     parameter EPOCH      = 32,
+    parameter NEW_CNT    = 3'd2,     // hybrid: next-line prefetches for a new stream
     parameter OFF_W      = $clog2(LINE_BYTES)
 )(
     input  wire               clk,
@@ -55,12 +57,14 @@ module stride_predictor #(
     output reg  [ADDR_W-1:0]  trig_base,
     output reg  [ADDR_W-1:0]  trig_step,     // two's complement byte step
     output reg  [2:0]         trig_count,
-    output reg  [2:0]         degree
+    output reg  [2:0]         degree,
+    output reg                low_accuracy   // last epoch < 50 % useful
 );
-    localparam MODE_OFF = 2'd0, MODE_NEXT = 2'd1, MODE_STRIDE = 2'd2;
+    localparam MODE_NEXT = 2'd1, MODE_STRIDE = 2'd2, MODE_HYBRID = 2'd3;
     localparam IW     = (NSTREAM > 1) ? $clog2(NSTREAM) : 1;
-    localparam HI_TH  = (EPOCH * 3) / 4;
-    localparam LO_TH  = EPOCH / 2;
+    localparam HI_TH  = (EPOCH * 3) / 4;   // >= 75 % useful -> more aggressive
+    localparam LO_TH  = EPOCH / 4;         // <  25 % useful -> less aggressive
+    localparam LA_TH  = EPOCH / 2;         // <  50 % useful -> low-accuracy flag
     localparam CW     = $clog2(EPOCH) + 1;
 
     // ---------------- registered training input -----------------------
@@ -144,7 +148,7 @@ module stride_predictor #(
                     trig_step  <= LINE_BYTES;
                     trig_count <= degree;
                 end
-            end else if (tr_v && mode == MODE_STRIDE) begin
+            end else if (tr_v && (mode == MODE_STRIDE || mode == MODE_HYBRID)) begin
                 if (match) begin
                     if (mdiff != 0) begin
                         s_last[midx] <= tr_addr;
@@ -167,6 +171,17 @@ module stride_predictor #(
                     s_stride[vidx] <= {STR_W{1'b0}};
                     s_conf[vidx]   <= 2'd0;
                     if (!vfound) rr_ptr <= rr_ptr + 1'b1;
+                    // Hybrid: a brand-new stream that starts with a miss gets
+                    // NEW_CNT next-line prefetches at once (short streams such
+                    // as embedding rows never live long enough to train a
+                    // stride).  Gated off while measured accuracy is low, so
+                    // random traffic does not double DRAM traffic.
+                    if (mode == MODE_HYBRID && tr_miss && !low_accuracy) begin
+                        trig_valid <= 1'b1;
+                        trig_base  <= {tr_addr[ADDR_W-1:OFF_W], {OFF_W{1'b0}}};
+                        trig_step  <= LINE_BYTES;
+                        trig_count <= NEW_CNT;
+                    end
                 end
             end
         end
@@ -174,22 +189,25 @@ module stride_predictor #(
 
     // ---------------- adaptive degree (accuracy feedback) --------------
     reg  [CW-1:0] ep_issued, ep_useful;
-    wire [CW-1:0] iss_n = ep_issued + (fb_issued ? 1'b1 : 1'b0);
-    wire [CW-1:0] use_n = (ep_useful >= EPOCH) ? ep_useful : ep_useful + (fb_useful ? 1'b1 : 1'b0);
+    wire [CW-1:0] iss_n = ep_issued + {{(CW-1){1'b0}}, fb_issued};
+    wire [CW-1:0] use_n = (ep_useful >= EPOCH) ? ep_useful : ep_useful + {{(CW-1){1'b0}}, fb_useful};
 
+    // Epoch accounting always runs (drives the low-accuracy flag used by the
+    // adaptive insertion policy); degree changes only when adaptive_en = 1.
     always @(posedge clk) begin
         if (rst) begin
-            degree    <= deg_clamped;
-            ep_issued <= 0;
-            ep_useful <= 0;
-        end else if (!adaptive_en) begin
-            degree    <= deg_clamped;
-            ep_issued <= 0;
-            ep_useful <= 0;
+            degree       <= deg_clamped;
+            low_accuracy <= 1'b0;
+            ep_issued    <= 0;
+            ep_useful    <= 0;
         end else begin
+            if (!adaptive_en) degree <= deg_clamped;
             if (iss_n >= EPOCH) begin
-                if (use_n >= HI_TH && degree < DEG_MAX)      degree <= degree + 3'd1;
-                else if (use_n < LO_TH && degree > 3'd1)     degree <= degree - 3'd1;
+                low_accuracy <= (use_n < LA_TH);
+                if (adaptive_en) begin
+                    if (use_n >= HI_TH && degree < DEG_MAX)  degree <= degree + 3'd1;
+                    else if (use_n < LO_TH && degree > 3'd1) degree <= degree - 3'd1;
+                end
                 ep_issued <= 0;
                 ep_useful <= 0;
             end else begin

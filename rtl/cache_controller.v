@@ -25,8 +25,11 @@
 //
 // Fills: one per cycle, only in cycles without a demand lookup, so the tag,
 // data and LRU arrays see a single update per cycle (no conflicts).
-// Prefetch fills set the line's "prefetched" bit and can be inserted at the
-// LRU position (pf_insert_lru = 1, prefetch-aware insertion).
+// Prefetch fills set the line's "prefetched" bit.  Adaptive insertion
+// (pf_insert_lru = 1): while the prefetcher's measured accuracy is low, new
+// prefetched lines are inserted at the LRU position (first to be evicted, so
+// bad guesses cannot push out demand data); while accuracy is good they are
+// inserted at MRU like demand lines (so good prefetches survive until used).
 // Synthesizable Verilog-2005.
 // ============================================================================
 module cache_controller #(
@@ -73,6 +76,7 @@ module cache_controller #(
     output wire               fb_useful,
     // Configuration
     input  wire               pf_insert_lru,
+    input  wire               pf_low_accuracy,
     // Performance counters
     output reg  [31:0]        cnt_access,
     output reg  [31:0]        cnt_hit,
@@ -162,7 +166,7 @@ module cache_controller #(
         .upd_en((do_lookup && hit) || do_fill),
         .upd_idx(do_lookup ? rq_idx : f_idx),
         .upd_way(do_lookup ? hit_way : victim_way),
-        .upd_lru(do_lookup ? 1'b0 : (f_pf && pf_insert_lru))
+        .upd_lru(do_lookup ? 1'b0 : (f_pf && pf_insert_lru && pf_low_accuracy))
     );
     wire f_evict_unused = c_valid[victim_way] && c_pf[victim_way];
 

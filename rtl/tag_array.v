@@ -67,17 +67,17 @@ module tag_array #(
             pf_bits    <= {(SETS*WAYS){1'b0}};
         end else begin
             if (we) begin
-                valid_bits[w_idx*WAYS + w_way] <= 1'b1;
-                pf_bits   [w_idx*WAYS + w_way] <= w_pf;
+                valid_bits[{w_idx, w_way}] <= 1'b1;
+                pf_bits   [{w_idx, w_way}] <= w_pf;
             end
             if (pfc_en)
-                pf_bits[pfc_idx*WAYS + pfc_way] <= 1'b0;
+                pf_bits[{pfc_idx, pfc_way}] <= 1'b0;
         end
     end
 
     // Tag storage (no reset needed, qualified by valid bit)
     always @(posedge clk) begin
         if (we)
-            tag_mem[w_idx*WAYS + w_way] <= w_tag;
+            tag_mem[{w_idx, w_way}] <= w_tag;
     end
 endmodule

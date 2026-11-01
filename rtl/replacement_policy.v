@@ -67,7 +67,7 @@ module replacement_policy #(
     always @* begin
         for (i = 0; i < WAYS; i = i + 1) begin
             a = cur_age[i*WAY_W +: WAY_W];
-            if (i == upd_way)
+            if (i[WAY_W-1:0] == upd_way)
                 nxt_age[i*WAY_W +: WAY_W] = upd_lru ? AGE_MAX[WAY_W-1:0] : {WAY_W{1'b0}};
             else if (!upd_lru && (a < ref_age))
                 nxt_age[i*WAY_W +: WAY_W] = a + 1'b1;   // older by one

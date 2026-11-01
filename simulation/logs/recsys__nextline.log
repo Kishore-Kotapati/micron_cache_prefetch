@@ -1,0 +1,4 @@
+vvp -n simulation/build/sim.vvp +trace=traces/recsys.trace +tag=nextline +mode=1 +adaptive=0 +degree=1 +inslru=0
+RESULT tag=nextline trace=traces/recsys.trace mode=1 adaptive=0 degree=1 inslru=0 accesses=9600 hits=8848 misses=752 dem_mem=303 pf_issued=1116 pf_useful=398 pf_late=449 pf_evict_unused=242 pf_resident_unused=27 pf_filtered=33 cand_pushed=1149 final_degree=1 cycles=55005 total_latency=31046 miss_latency_sum=22198 max_latency=42 errors=0
+TEST PASSED
+testbench/tb_system.v:186: $finish called at 550106000 (1ps)

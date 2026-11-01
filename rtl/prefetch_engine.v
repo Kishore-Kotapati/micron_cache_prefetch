@@ -21,7 +21,7 @@ module prefetch_engine #(
     parameter QDEPTH     = 8,
     parameter PAGE_BITS  = 12,
     parameter NSTREAM    = 4,
-    parameter DEG_MAX    = 4,
+    parameter DEG_MAX    = 7,
     parameter OFF_W      = $clog2(LINE_BYTES),
     parameter LADDR_W    = ADDR_W - OFF_W
 )(
@@ -40,6 +40,7 @@ module prefetch_engine #(
     output wire [LADDR_W-1:0] cand_line,
     input  wire               cand_pop,
     output wire [2:0]         degree,
+    output wire               low_accuracy,
     output reg  [31:0]        cnt_cand_pushed,
     output reg  [31:0]        cnt_cand_dup,
     output reg  [31:0]        cnt_page_stop
@@ -59,7 +60,7 @@ module prefetch_engine #(
         .train_miss(train_miss), .train_pfhit(train_pfhit),
         .fb_issued(fb_issued), .fb_useful(fb_useful),
         .trig_valid(trig_valid), .trig_base(trig_base), .trig_step(trig_step),
-        .trig_count(trig_count), .degree(degree)
+        .trig_count(trig_count), .degree(degree), .low_accuracy(low_accuracy)
     );
 
     // ---------------- generator -----------------------------------------

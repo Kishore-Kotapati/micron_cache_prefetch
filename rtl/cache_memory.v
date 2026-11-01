@@ -23,10 +23,10 @@ module cache_memory #(
 );
     reg [LINE_W-1:0] data_mem [0:SETS*WAYS-1];
 
-    assign r_data = data_mem[r_idx*WAYS + r_way];
+    assign r_data = data_mem[{r_idx, r_way}];
 
     always @(posedge clk) begin
         if (we)
-            data_mem[w_idx*WAYS + w_way] <= w_data;
+            data_mem[{w_idx, w_way}] <= w_data;
     end
 endmodule

@@ -1,0 +1,4 @@
+vvp -n simulation/build/sim.vvp +trace=traces/stride.trace +tag=stride_adapt +mode=2 +adaptive=1 +degree=2 +inslru=0
+RESULT tag=stride_adapt trace=traces/stride.trace mode=2 adaptive=1 degree=2 inslru=0 accesses=3000 hits=626 misses=2374 dem_mem=39 pf_issued=2968 pf_useful=626 pf_late=2335 pf_evict_unused=0 pf_resident_unused=7 pf_filtered=9285 cand_pushed=12253 final_degree=7 cycles=25705 total_latency=18148 miss_latency_sum=17522 max_latency=42 errors=0
+TEST PASSED
+testbench/tb_system.v:186: $finish called at 257666000 (1ps)

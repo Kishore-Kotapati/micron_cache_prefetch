@@ -1,0 +1,4 @@
+vvp -n simulation/build/sim.vvp +trace=traces/llm.trace +tag=baseline +mode=0 +adaptive=0 +degree=1 +inslru=0
+RESULT tag=baseline trace=traces/llm.trace mode=0 adaptive=0 degree=1 inslru=0 accesses=8320 hits=7020 misses=1300 dem_mem=1300 pf_issued=0 pf_useful=0 pf_late=0 pf_evict_unused=0 pf_resident_unused=0 pf_filtered=0 cand_pushed=0 final_degree=1 cycles=82323 total_latency=61620 miss_latency_sum=54600 max_latency=42 errors=0
+TEST PASSED
+testbench/tb_system.v:186: $finish called at 823286000 (1ps)
