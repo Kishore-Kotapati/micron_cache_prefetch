@@ -1,0 +1,11 @@
+512 B layout configuration (SETS=8) - Icarus Verilog, same testbench self-checks
+trace       baseline_cycles  final_cycles  speedup  checks
+sequential           112571         29172    3.86x  2/2 PASSED
+stride               133557         25688    5.20x  2/2 PASSED
+random               178139        178139    1.00x  2/2 PASSED
+repeated             132485        132239    1.00x  2/2 PASSED
+mixed                182305        108827    1.68x  2/2 PASSED
+capacity              84464         22016    3.84x  2/2 PASSED
+cnn                  193032         69393    2.78x  2/2 PASSED
+llm                   82323         38686    2.13x  2/2 PASSED
+recsys               124415         60817    2.05x  2/2 PASSED

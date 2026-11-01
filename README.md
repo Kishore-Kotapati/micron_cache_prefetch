@@ -26,6 +26,7 @@ tests pass · Verilator lint clean.
 | Pandas | result tables (`evaluate_results.py`, `visualize_results.py`) |
 | Matplotlib | all plots in `results/plots/` |
 | Yosys (extra) | synthesis: block diagram + gate counts (`synth/`) |
+| OpenROAD + KLayout (extra) | place-and-route to a real SkyWater 130 nm layout, 0 DRC violations (`physical/`) |
 Full numbers: `results/comparison.txt`, `docs/final_report.md`.
 
 ## How it works (in short)
@@ -48,6 +49,7 @@ Full numbers: `results/comparison.txt`, `docs/final_report.md`.
 | `simulation/waveforms/` | GTKWave demo waveforms + `demo.gtkw` signal layout |
 | `results/` | `performance_summary.csv`, `comparison.txt`, `summary_tables.md`, `trace_analysis.*`, `verilator_lint.txt`, `plots/` |
 | `synth/` | Yosys synthesis: block diagram, gate/flip-flop counts (`bash synth/run_synth.sh`) |
+| `physical/` | **real chip layout** on SkyWater 130 nm (Yosys → OpenROAD → KLayout): GDS, pictures, timing/power reports (512 B version) |
 | `docs/` | `Project_Learning_Guide.pdf` (start here), `architecture.md`, `algorithm.md`, `final_report.md` |
 
 ## Reproduce everything (one command)
@@ -102,5 +104,5 @@ matplotlib 3.11.
 
 ## Honest limitations
 Synthetic traces (not real AI model traces), read-only cache, single cache
-level, simple fixed-latency DRAM model, generic-gate synthesis only (no area/timing/power/placement). See
+level, simple fixed-latency DRAM model, physical layout done for a 512 B version only (4 KB needs an SRAM macro), layout timing ~69 MHz at the typical corner. See
 `docs/final_report.md` §12.

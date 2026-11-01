@@ -1,0 +1,4 @@
+out/*.def
+out/*.odb
+out/chip.gds
+out/route.guide
