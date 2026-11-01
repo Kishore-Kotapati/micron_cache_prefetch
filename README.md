@@ -47,7 +47,7 @@ Full numbers: `results/comparison.txt`, `docs/final_report.md`.
 | `simulation/waveforms/` | GTKWave demo waveforms + `demo.gtkw` signal layout |
 | `results/` | `performance_summary.csv`, `comparison.txt`, `summary_tables.md`, `trace_analysis.*`, `verilator_lint.txt`, `plots/` |
 | `synth/` | Yosys synthesis: block diagram, gate/flip-flop counts (`bash synth/run_synth.sh`) |
-| `docs/` | `architecture.md`, `algorithm.md`, `final_report.md` |
+| `docs/` | `Project_Learning_Guide.pdf` (start here), `architecture.md`, `algorithm.md`, `final_report.md` |
 
 ## Reproduce everything (one command)
 ```bash
